@@ -1,34 +1,27 @@
 ﻿namespace Domain.Core.Domain
 {
-    using System;
     using System.Collections.Generic;
 
     public abstract class StrongTypeId<TKey> : ValueObject<StrongTypeId<TKey>> where TKey : notnull
     {
-        public StrongTypeId(TKey value)
+        protected StrongTypeId(TKey value)
         {
-            if (value.Equals(Guid.Empty))
-                throw new ArgumentException("Id must be provided");
+            if (value.Equals(Guid.Empty)) throw new ArgumentException("Invalid id");
             Value = value;
-        }
-
-        public TKey Value { get; }
-        public static bool operator ==(StrongTypeId<TKey>? left, StrongTypeId<TKey>? right)
-        {
-            //var comparer = Comparer<TKey>.Default;
-            //return comparer.Compare(left.Value ,right.Value) == 0;
-            return left is not null && right is not null && Equals(left, right);
-        }
-        public static bool operator !=(StrongTypeId<TKey>? left, StrongTypeId<TKey>? right)
-        {
-            //var comparer = Comparer<TKey>.Default;
-            //return comparer.Compare(left.Value ,right.Value) != 0;
-            return left is not null && right is not null && !Equals(left, right);
         }
         protected override IEnumerable<object> GetEqualityComponents()
         {
             yield return Value;
         }
+        public static bool operator ==(StrongTypeId<TKey>? left, StrongTypeId<TKey>? right)
+        {
+            return EqualOperator(left, right);
+        }
+        public static bool operator !=(StrongTypeId<TKey>? left, StrongTypeId<TKey>? right)
+        {
+            return NotEqualOperator(left, right);
+        }
+        public TKey Value { get; }
 
         public override bool Equals(object? obj)
         {
